@@ -7,6 +7,7 @@ The provided layer along with the dynamic activation sparsity module is compatib
 ## Table of Contents
 
 - [More about SparseLinear](#intro)
+- [More about Dynamic Activation](#kwin)
 - [Installation](#install)
 - [Getting Started](#usage)
 - [Benchmark Results](#results)
@@ -26,11 +27,9 @@ The default static sparsity is random. With this flag, one can instead use small
 
 The user can grow and prune units during training starting from a sparse configuration using this feature. The implementation is based on [Rigging the lottery](https://arxiv.org/pdf/1911.11134.pdf) algorithm. Specify `dynamic` to be `True` to dynamically alter the layer connections while training. 
 
-In addition, we provide a Dynamic Activation Sparsity module to utilize principled, per-layer activation sparsity. 
+## Dynamic Activation Sparsity <a name="kwin"></a>
 
-## Dynamic Activation Sparsity
-
-The algorithm implementation is based on the [K-Winners strategy](https://arxiv.org/pdf/1903.11257.pdf). 
+In addition, we provide a Dynamic Activation Sparsity module to utilize principled, per-layer activation sparsity. The algorithm implementation is based on the [K-Winners strategy](https://arxiv.org/pdf/1903.11257.pdf). 
 
 ### Installation <a name="install"></a>
 
