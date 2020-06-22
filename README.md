@@ -2,7 +2,12 @@
 
 SparseLinear is a pytorch package that allows a user to create extremely wide and sparse linear layers efficiently. A sparsely connected network is a network where each node is connected to only a smaller fraction of available nodes. This differs from a fully connected network, where each node in one layer is connected to every node in the next layer.
 
-The provided layer is compatible with backpropagation, is initialized with sparsity, and supports unstructured sparsity. We achieve this by building a linear layer on top of PyTorch Sparse, which provides optimized sparse matrix operations with autograd support in PyTorch.
+The provided layer along with the dynamic activation sparsity module is compatible with backpropagation. The sparse linear layer is initialized with sparsity, supports unstructured sparsity and allows dynamic growth and pruning. We achieve this by building a linear layer on top of [PyTorch Sparse](https://github.com/rusty1s/pytorch_sparse), which provides optimized sparse matrix operations with autograd support in PyTorch.
+
+- More about Sparsity
+- Installation
+- Getting Started
+- Benchmark Results
 
 The default arguments initialise a sparse linear layer with random connections. The following customization can be done using appropriate arguments -
 
