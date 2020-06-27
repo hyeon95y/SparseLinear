@@ -13,15 +13,15 @@ The provided layer along with the dynamic activation sparsity module is compatib
 - [Benchmark Results](#results)
 
 ### More about SparseLinear <a name="intro"></a>
-The default arguments initialise a sparse linear layer with random connections. The following customization can be done using appropriate arguments -
+The default arguments initialize a sparse linear layer with random connections. The following customization can be done using appropriate arguments -
 
 #### User-defined Sparsity
 
-One can choose to add a self-defined static sparsity. The `connectivity` flag accepts a (2, nnz) LongTensor that represents the rows and columns of nonzero elements in the layer. 
+One can choose to add self-defined static sparsity. The `connectivity` flag accepts a (2, nnz) LongTensor that represents the rows and columns of nonzero elements in the layer. 
 
 #### Small-world Sparsity
 
-The default static sparsity is random. With this flag, one can instead use small-world sparsity. See [here](https://en.wikipedia.org/wiki/Small-world_network). To specify, set `small_world` to `True`. 
+The default static sparsity is random. With this flag, one can instead use small-world sparsity. See [here](https://en.wikipedia.org/wiki/Small-world_network). To specify, set `small_world` to `True`. Specifically, we make connections distant dependent to ensure small-world behavior.
 
 #### Dynamic Growing and Pruning Algorithm
 
