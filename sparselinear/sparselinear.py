@@ -6,11 +6,10 @@ import torch
 import torch.nn as nn
 import torch_sparse
 
-# Custom pytorch function to handle growing connections
+# Custom PyTorch function to handle growing connections
 class GrowConnections(torch.autograd.Function):
     @staticmethod
-    def forward(ctx,input,weights, k, indices, features):
-
+    def forward(ctx, input, weights, k, indices, features):
         out_features, in_features = features
         output_shape = list(input.shape)
         output_shape[-1] = out_features
@@ -18,6 +17,7 @@ class GrowConnections(torch.autograd.Function):
         input = input.flatten(end_dim=-2)
 
         output = torch_sparse.spmm(indices, weights, out_features, in_features, input.t()).t()
+        
         ctx.save_for_backward(input, weights, indices)
         ctx.in1 = k
         ctx.in2 = out_features
@@ -33,10 +33,12 @@ class GrowConnections(torch.autograd.Function):
         k = ctx.in1
         out_features = ctx.in2
         in_features = ctx.in3
+        
         p_index = torch.LongTensor([1,0])
         new_indices = torch.zeros_like(indices).to(device=torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu'))
         new_indices[p_index] = indices
         grad_input = torch_sparse.spmm(new_indices, weights, in_features, out_features, grad_output.t()).t()
+        
         if in_features*out_features <= 10**8:
             grad_weights = torch.abs(torch.matmul(input.t(),grad_output).t())
             mask = torch.zeros_like(grad_weights)
@@ -47,41 +49,41 @@ class GrowConnections(torch.autograd.Function):
         else:
             tk = None
             max_size = 10**8
-            m = max_size/in_features
-            chunks = math.ceil(out_features/m)
+            m = max_size / in_features
+            chunks = math.ceil(out_features / m)
             for item in range(chunks):
-                if item!=chunks-1:
-                    topk_values, topk_indices = torch.topk(torch.abs(torch.matmul(input.t()[item*m:(item+1)*m,:],grad_output).t()).view(-1),k,sorted=False)
+                if item != chunks - 1:
+                    topk_values, topk_indices = torch.topk(torch.abs(torch.matmul(input.t()[item*m:(item+1)*m, :], grad_output).t()).view(-1), k, sorted=False)
                 else:
-                    topk_values, topk_indices = torch.topk(torch.abs(torch.matmul(input.t()[item*m:,:],grad_output).t()).view(-1),k,sorted=False)
+                    topk_values, topk_indices = torch.topk(torch.abs(torch.matmul(input.t()[item*m:, :], grad_output).t()).view(-1), k, sorted=False)
                 
-                row = topk_indices.floor_divide(in_features) + torch.ones_like(topk_indices)*item*m
+                row = topk_indices.floor_divide(in_features) + torch.ones_like(topk_indices) * item * m
                 col = topk_indices.fmod(in_features)
-                indices = torch.stack((row,col))
+                indices = torch.stack((row, col))
                 
                 if tk is None:
                     tk = torch.cat((topk_values, indices), dim=0)
                 else:
                     topk_values_prev = tk[0]
-                    topk_values_2k, topk_indices_2k = torch.topk(torch.cat((topk_values_prev, topk_values), dim=1).view(-1),k,sorted=False)
+                    topk_values_2k, topk_indices_2k = torch.topk(torch.cat((topk_values_prev, topk_values), dim=1).view(-1), k, sorted=False)
                     # Get the topk indices from the combination of two indices
                     
-                    topk_prev = topk_indices_2k[topk_indices_2k<k]
+                    topk_prev = topk_indices_2k[topk_indices_2k < k]
                     topk_values_indices = tk[:][topk_prev]
 
-                    topk_curr = topk_indices_2k[topk_indices_2k>=k]
+                    topk_curr = topk_indices_2k[topk_indices_2k >= k]
                     topk_curr = topk_curr % k
 
                     curr_indices = indices[:][topk_curr]
                     curr_values = topk_values[topk_curr]
 
-                    tk = torch.cat((topk_values_indices,(torch.cat((curr_indices,curr_values),dim=0))),dim=1)
+                    tk = torch.cat((topk_values_indices, (torch.cat((curr_indices,curr_values), dim=0))), dim=1)
             row = tk[1]
             col = tk[2]
         new_indices = torch.stack((row, col))
-        x = torch.cat((indices[:,:-k], new_indices),dim=1)
+        x = torch.cat((indices[:,:-k], new_indices), dim=1)
         if indices.shape[1] > x.shape[1]:
-            x = torch.cat((x,torch.zeros((2,indices.shape[1]-x.shape[1]), dtype=torch.long).to(device=torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu'))), dim=1)
+            x = torch.cat((x,torch.zeros((2,indices.shape[1] - x.shape[1]), dtype=torch.long).to(device=torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu'))), dim=1)
         indices.copy_(x)
 
         return grad_input, None, None, None, None
@@ -164,6 +166,7 @@ class SparseLinear(nn.Module):
             nnz = round((1.0-sparsity) * in_features * out_features)
             assert nnz > min(in_features, out_features), 'The matrix is too sparse for small-world algorithm; please decrease sparsity'
             offset = abs(out_features - in_features) / 2.
+            
             # Node labels
             inputs = torch.linspace(1 + offset * (out_features > in_features), in_features + offset * (out_features > in_features), steps=in_features, device=torch.device('cpu'))
             outputs = torch.linspace(1 + offset * (out_features < in_features), out_features + offset * (out_features < in_features), steps=out_features, device=torch.device('cpu'))
@@ -180,9 +183,11 @@ class SparseLinear(nn.Module):
             count = 0
             rows = torch.empty(0).long().to(device=coalesce_device)
             cols = torch.empty(0).long().to(device=coalesce_device)
+            
             def small_world_chunker(inputs, outputs, nnz):
                 pair_distance = inputs.view(-1, 1) - outputs
                 arg = torch.abs(pair_distance) + 1.
+                
                 # lambda search
                 error = float('inf')
                 L, U = 1e-5, 5.  
@@ -208,6 +213,7 @@ class SparseLinear(nn.Module):
                     error = abs(P_sum - nnz)
                     itr += 1
                 return P
+            
             for i in range(chunks):
                 inputs_ = inputs[idx[i]:idx[i+1]] if out_features < in_features else inputs
                 outputs_ = outputs[idx[i]:idx[i+1]] if out_features > in_features else outputs
@@ -223,8 +229,10 @@ class SparseLinear(nn.Module):
 
                 rows = torch.cat([rows, rows_ + idx[i]])
                 cols = torch.cat([cols, cols_])
+                
             indices = torch.stack((cols, rows))
             nnz = indices.shape[1]
+            
         values = torch.empty(nnz, device=coalesce_device)
         indices, values = torch_sparse.coalesce(indices, values, out_features, in_features)
         self.register_buffer('indices', indices.cpu())
@@ -268,19 +276,19 @@ class SparseLinear(nn.Module):
         if self.train and self.dynamic and self.itr_count < self.Tend and self.itr_count%self.deltaT==0:
             
             #Drop criterion
-            f_decay = self.alpha*(1+math.cos(self.itr_count*math.pi/self.Tend))/2
-            k = int(f_decay*(1-self.sparsity)*self.weights.view(-1,1).shape[0])
+            f_decay = self.alpha * (1 + math.cos(self.itr_count * math.pi / self.Tend)) / 2
+            k = int(f_decay * (1 - self.sparsity) * self.weights.view(-1,1).shape[0])
             n = self.weights.shape[0]
             
-            _, lm_indices = torch.topk(-torch.abs(self.weights),n-k, largest=False, sorted=False)
+            _, lm_indices = torch.topk(-torch.abs(self.weights), n - k, largest=False, sorted=False)
 
-            self.indices = torch.index_select(self.indices,1, lm_indices)
+            self.indices = torch.index_select(self.indices, 1, lm_indices)
             self.weights = nn.Parameter(torch.index_select(self.weights, 0, lm_indices))
 
             device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
             #Growth criterion
-            self.weights = nn.Parameter(torch.cat((self.weights,torch.zeros(k).to(device=device)),dim=0))
-            self.indices = torch.cat((self.indices,torch.zeros((2,k), dtype=torch.long).to(device=device)),dim=1)
+            self.weights = nn.Parameter(torch.cat((self.weights,torch.zeros(k).to(device=device)), dim=0))
+            self.indices = torch.cat((self.indices, torch.zeros((2, k), dtype=torch.long).to(device=device)), dim=1)
             output = GrowConnections.apply(input,self.weights, k, self.indices, (self.out_features, self.in_features))
            
         else:
