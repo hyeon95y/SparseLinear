@@ -20,24 +20,24 @@ The default arguments initialize a sparse linear layer with random connections t
 - **in_features** - size of each input sample
 - **out_features** - size of each output sample
 - **bias** - If set to ``False``, the layer will not learn an additive bias. Default: ``True``
-- **sparsity** - sparsity of weight matrix. Default: 0.9
-- **connectivity** - User defined sparsity matrix. Default: None
-- **small_world** - Boolean flag to generate small world sparsity. Default: ``False``
-- **dynamic** - Boolean flag to dynamically change the network structure. Default: ``False``
-- **deltaT** - frequency for growing and pruning update step. Default: 6000
-- **Tend** - Stopping time for growing and pruning algorithm update step. Default: 150000
-- **alpha** - f-decay parameter for cosine updates. Default: 0.1
-- **max_size** - Maximum number of entries allowed before chunking occurrs. Default: 1e8
+- **sparsity** - sparsity of weight matrix. Default: `0.9`
+- **connectivity** - user defined sparsity matrix. Default: `None`
+- **small_world** - boolean flag to generate small world sparsity. Default: ``False``
+- **dynamic** - boolean flag to dynamically change the network structure. Default: ``False``
+- **deltaT** - frequency for growing and pruning update step. Default: `6000`
+- **Tend** - stopping time for growing and pruning algorithm update step. Default: `150000`
+- **alpha** - f-decay parameter for cosine updates. Default: `0.1`
+- **max_size** - maximum number of entries allowed before chunking occurrs. Default: `1e8`
 
 ##### Shape
 
-- Input: `(N, *, H_{in})` where :math:`*` means any number of additional dimensions and `H_{in} = \text{in\_features}`
-- Output: `(N, *, H_{out})` where all but the last dimension are the same shape as the input and `H_{out} = \text{out\_features}`.
+- Input: `(N, *, H_{in})` where `*` means any number of additional dimensions and `H_{in} = in\_features`
+- Output: `(N, *, H_{out})` where all but the last dimension are the same shape as the input and `H_{out} = out\_features`.
 
 ##### Variables 
 
-- **~SparseLinear.weight** - the learnable weights of the module of shape `(\text{out\_features}, \text{in\_features})`. The values are initialized from `\mathcal{U}(-\sqrt{k}, \sqrt{k})`, where `k = \frac{1}{\text{in\_features}}`
-- **bias** - the learnable bias of the module of shape `(\text{out\_features})`. If :attr:`bias` is ``True``, the values are initialized from `\mathcal{U}(-\sqrt{k}, \sqrt{k})` where `k = \frac{1}{\text{in\_features}}`
+- **~SparseLinear.weight** - the learnable weights of the module of shape `({out\_features}, {in\_features})`. The values are initialized from `\mathcal{U}(-\sqrt{k}, \sqrt{k})`, where `k = \frac{1}{\text{in\_features}}`
+- **~SparseLinear.bias** - the learnable bias of the module of shape `(\text{out\_features})`. If :attr:`bias` is ``True``, the values are initialized from `\mathcal{U}(-\sqrt{k}, \sqrt{k})` where `k = \frac{1}{\text{in\_features}}`
 
 ##### Examples:
 
