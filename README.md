@@ -31,13 +31,13 @@ The default arguments initialize a sparse linear layer with random connections t
 
 ##### Shape
 
-- Input: `(N, *, H_{in})` where `*` means any number of additional dimensions and `H_{in} = in\_features`
-- Output: `(N, *, H_{out})` where all but the last dimension are the same shape as the input and `H_{out} = out\_features`.
+- Input: `(N, *, H_{in})` where `*` means any number of additional dimensions and `H_{in} = in_features`
+- Output: `(N, *, H_{out})` where all but the last dimension are the same shape as the input and `H_{out} = out_features`.
 
 ##### Variables 
 
-- **~SparseLinear.weight** - the learnable weights of the module of shape `({out\_features}, {in\_features})`. The values are initialized from `\mathcal{U}(-\sqrt{k}, \sqrt{k})`, where `k = \frac{1}{\text{in\_features}}`
-- **~SparseLinear.bias** - the learnable bias of the module of shape `(\text{out\_features})`. If :attr:`bias` is ``True``, the values are initialized from `\mathcal{U}(-\sqrt{k}, \sqrt{k})` where `k = \frac{1}{\text{in\_features}}`
+- **~SparseLinear.weight** - the learnable weights of the module of shape `(out_features, in_features)`. The values are initialized from $\mathcal{U}(-\sqrt{k}, \sqrt{k})$, where k = \frac{1}{\text{in\_features}}
+- **~SparseLinear.bias** - the learnable bias of the module of shape `(out_features)`. If `bias` is ``True``, the values are initialized from \mathcal{U}(-\sqrt{k}, \sqrt{k}) where k = \frac{1}{\text{in\_features}}
 
 ##### Examples:
 
