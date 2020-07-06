@@ -13,7 +13,7 @@ The provided layer along with the dynamic activation sparsity module is compatib
 - [Benchmark Results](#results)
 
 ### More about SparseLinear <a name="intro"></a>
-The default arguments initialize a sparse linear layer with random connections that applies a linear transformation to the incoming data :math:`y = xA^T + b` 
+The default arguments initialize a sparse linear layer with random connections that applies a linear transformation to the incoming data `y = xA^T + b` 
 
 ##### Parameters
 
@@ -31,22 +31,22 @@ The default arguments initialize a sparse linear layer with random connections t
 
 ##### Shape
 
-- Input: :math:`(N, *, H_{in})` where :math:`*` means any number of additional dimensions and :math:`H_{in} = \text{in\_features}`
-- Output: :math:`(N, *, H_{out})` where all but the last dimension are the same shape as the input and :math:`H_{out} = \text{out\_features}`.
+- Input: `(N, *, H_{in})` where :math:`*` means any number of additional dimensions and `H_{in} = \text{in\_features}`
+- Output: `(N, *, H_{out})` where all but the last dimension are the same shape as the input and `H_{out} = \text{out\_features}`.
 
 ##### Variables 
 
-- **~SparseLinear.weight** - the learnable weights of the module of shape :math:`(\text{out\_features}, \text{in\_features})`. The values are initialized from :math:`\mathcal{U}(-\sqrt{k}, \sqrt{k})`, where :math:`k = \frac{1}{\text{in\_features}}`
-- **bias** - the learnable bias of the module of shape :math:`(\text{out\_features})`. If :attr:`bias` is ``True``, the values are initialized from :math:`\mathcal{U}(-\sqrt{k}, \sqrt{k})` where :math:`k = \frac{1}{\text{in\_features}}`
+- **~SparseLinear.weight** - the learnable weights of the module of shape `(\text{out\_features}, \text{in\_features})`. The values are initialized from `\mathcal{U}(-\sqrt{k}, \sqrt{k})`, where `k = \frac{1}{\text{in\_features}}`
+- **bias** - the learnable bias of the module of shape `(\text{out\_features})`. If :attr:`bias` is ``True``, the values are initialized from `\mathcal{U}(-\sqrt{k}, \sqrt{k})` where `k = \frac{1}{\text{in\_features}}`
 
 ##### Examples:
 
 ```python
-        >>> m = nn.SparseLinear(20, 30)
-        >>> input = torch.randn(128, 20)
-        >>> output = m(input)
-        >>> print(output.size())
-        torch.Size([128, 30])
+ >>> m = nn.SparseLinear(20, 30)
+ >>> input = torch.randn(128, 20)
+ >>> output = m(input)
+ >>> print(output.size())
+ torch.Size([128, 30])
 ```
 
 The following customization can also be done using appropriate arguments -
