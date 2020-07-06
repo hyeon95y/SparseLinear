@@ -15,7 +15,7 @@ The provided layer along with the dynamic activation sparsity module is compatib
 ### More about SparseLinear <a name="intro"></a>
 The default arguments initialize a sparse linear layer with random connections that applies a linear transformation to the incoming data <img src="https://render.githubusercontent.com/render/math?math=y = xA^T %2B b">  
 
-##### Parameters
+#### Parameters
 
 - **in_features** - size of each input sample
 - **out_features** - size of each output sample
@@ -29,17 +29,17 @@ The default arguments initialize a sparse linear layer with random connections t
 - **alpha** - f-decay parameter for cosine updates. Default: `0.1`
 - **max_size** - maximum number of entries allowed before chunking occurrs. Default: `1e8`
 
-##### Shape
+#### Shape
 
 - Input: `(N, *, H_{in})` where `*` means any number of additional dimensions and `H_{in} = in_features`
-- Output: `(N, *, H_{out})` where all but the last dimension are the same shape as the input and `H_{out} = out_features`.
+- Output: `(N, *, H_{out})` where all but the last dimension are the same shape as the input and `H_{out} = out_features`
 
-##### Variables 
+#### Variables 
 
-- **~SparseLinear.weight** - the learnable weights of the module of shape `(out_features, in_features)`. The values are initialized from <img src="https://render.githubusercontent.com/render/math?math=\mathcal{U}(-\sqrt{k}, \sqrt{k})">, where <img src="https://render.githubusercontent.com/render/math?math=k = \frac{1}{\text{in\_features}}">  
-- **~SparseLinear.bias** - the learnable bias of the module of shape `(out_features)`. If `bias` is ``True``, the values are initialized from \mathcal{U}(-\sqrt{k}, \sqrt{k}) where k = \frac{1}{\text{in\_features}}
+- **~SparseLinear.weight** - the learnable weights of the module of shape `(out_features, in_features)`. The values are initialized from <img src="https://render.githubusercontent.com/render/math?math=\mathcal{U}(-\sqrt{k}, \sqrt{k})">, where  <img src="https://render.githubusercontent.com/render/math?math=k = \frac{1}{\text{in\_features}}">  
+- **~SparseLinear.bias** - the learnable bias of the module of shape `(out_features)`. If `bias` is ``True``, the values are initialized from <img src="https://render.githubusercontent.com/render/math?math=\mathcal{U}(-\sqrt{k}, \sqrt{k})"> where <img src="https://render.githubusercontent.com/render/math?math=k = \frac{1}{\text{in\_features}}">
 
-##### Examples:
+#### Examples:
 
 ```python
  >>> m = nn.SparseLinear(20, 30)
