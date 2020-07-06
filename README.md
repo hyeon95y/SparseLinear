@@ -92,4 +92,4 @@ In addition, we provide a Dynamic Activation Sparsity module to utilize principl
 
 ## Getting Started <a name="usage"></a>
 
-We provide a Jupyter notebook in [this]() repository that demonstrates the basic functionalities of the sparse linear layer. We also show steps to train various models using the additional features of this package.
+We provide a Jupyter notebook in [this](https://github.com/rain-neuromorphics/SparseLinear/blob/master/tutorials/SparseLinearDemo.ipynb) repository that demonstrates the basic functionalities of the sparse linear layer. We also show steps to train various models using the additional features of this package.
