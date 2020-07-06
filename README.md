@@ -67,6 +67,25 @@ The user can grow and prune units during training starting from a sparse configu
 
 In addition, we provide a Dynamic Activation Sparsity module to utilize principled, per-layer activation sparsity. The algorithm implementation is based on the [K-Winners strategy](https://arxiv.org/pdf/1903.11257.pdf). 
 
+#### Parameters
+
+- **alpha** - constant used in updating duty-cycle. Default: `0.1`
+- **beta** - boosting factor for neurons not activated in the previous duty cycle. Default: `1.5`
+- **act_sparsity** - fraction of the input used in calculating K for K-Winners strategy. Default: `0.65`
+    
+#### Shape
+
+- Input: `(N, *)` where `*` means, any number of additional dimensions
+- Output: `(N, *)`, same shape as the input
+        
+#### Examples:
+
+```python
+>>> x = asy.ActivationSparsity(10)
+>>> input = torch.randn(3,10)
+>>> output = x(input)
+```
+
 ### Installation <a name="install"></a>
 
 ### Getting Started <a name="usage"></a>
