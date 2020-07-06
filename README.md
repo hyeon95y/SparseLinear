@@ -13,7 +13,43 @@ The provided layer along with the dynamic activation sparsity module is compatib
 - [Benchmark Results](#results)
 
 ### More about SparseLinear <a name="intro"></a>
-The default arguments initialize a sparse linear layer with random connections. The following customization can be done using appropriate arguments -
+The default arguments initialize a sparse linear layer with random connections that applies a linear transformation to the incoming data :math:`y = xA^T + b` 
+
+##### Parameters
+
+- **in_features** - size of each input sample
+- **out_features** - size of each output sample
+- **bias** - If set to ``False``, the layer will not learn an additive bias. Default: ``True``
+- **sparsity** - sparsity of weight matrix. Default: 0.9
+- **connectivity** - User defined sparsity matrix. Default: None
+- **small_world** - Boolean flag to generate small world sparsity. Default: ``False``
+- **dynamic** - Boolean flag to dynamically change the network structure. Default: ``False``
+- **deltaT** - frequency for growing and pruning update step. Default: 6000
+- **Tend** - Stopping time for growing and pruning algorithm update step. Default: 150000
+- **alpha** - f-decay parameter for cosine updates. Default: 0.1
+- **max_size** - Maximum number of entries allowed before chunking occurrs. Default: 1e8
+
+##### Shape
+
+- Input: :math:`(N, *, H_{in})` where :math:`*` means any number of additional dimensions and :math:`H_{in} = \text{in\_features}`
+- Output: :math:`(N, *, H_{out})` where all but the last dimension are the same shape as the input and :math:`H_{out} = \text{out\_features}`.
+
+##### Variables 
+
+- **~SparseLinear.weight** - the learnable weights of the module of shape :math:`(\text{out\_features}, \text{in\_features})`. The values are initialized from :math:`\mathcal{U}(-\sqrt{k}, \sqrt{k})`, where :math:`k = \frac{1}{\text{in\_features}}`
+- **bias** - the learnable bias of the module of shape :math:`(\text{out\_features})`. If :attr:`bias` is ``True``, the values are initialized from :math:`\mathcal{U}(-\sqrt{k}, \sqrt{k})` where :math:`k = \frac{1}{\text{in\_features}}`
+
+##### Examples:
+
+```python
+        >>> m = nn.SparseLinear(20, 30)
+        >>> input = torch.randn(128, 20)
+        >>> output = m(input)
+        >>> print(output.size())
+        torch.Size([128, 30])
+```
+
+The following customization can also be done using appropriate arguments -
 
 #### User-defined Sparsity
 
