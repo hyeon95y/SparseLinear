@@ -3,66 +3,68 @@ import torch
 import torch.nn as nn
 
 class ActivationSparsity(nn.Module):
-    """Applies activation sparsity using k-winners strategy to the input.
-    See here: https://arxiv.org/abs/1903.11257
+    """Applies activation sparsity to the last dimension of input using K-winners strategy
 
     Args:
-        in_features (int): size of each input sample
-        k (int): The K in K-Winners strategy
-        alpha (float): The constant used in updating duty-cycle
-        beta (float): Boosting factor for neurons not activated in the previous duty cycle
-        act_sparsity (float): Proportion of innactive units
+        alpha (float): constant used in updating duty-cycle
+            Default: 0.1
+        beta (float): boosting factor for neurons not activated in the previous duty cycle
+            Default: 1.5
+        act_sparsity (float): fraction of the input used in calculating K for K-Winners strategy
+            Default: 0.65
+    
     Shape:
-        Input: (N, in_features) 
-        Output: (N, in_features)
-    Examples:
-        >>> input = torch.randn(3, 10)
+        - Input: :math:`(N, *)` where `*` means, any number of additional dimensions
+        - Output: :math:`(N, *)`, same shape as the input
+        
+    Examples::
+    
         >>> x = asy.ActivationSparsity(10)
-        >>> output = x(input) 
+        >>> input = torch.randn(3,10)
+        >>> output = x(input)
     """
-    def __init__(self, k=5, alpha=0.1, beta=1, act_sparsity=0.8):
+    def __init__(self, alpha=0.1, beta=1.5, act_sparsity=0.65):
         super(ActivationSparsity, self).__init__()
         self.alpha = alpha
         self.beta = beta
-        self.prev_duty_cycle = None
         self.act_sparsity = act_sparsity
-        self.k = None
+        self.duty_cycle = None
     
-    def updateDC(self, inputs, prev_duty_cycle):
-        """Function to calculate the activation sparsity using the k-winners strategy. This is
-            to be used as an activation function by the sparselinear layer. 
-
-        Args:
-            inputs ([torch.Tensor]): [Input tensor from the linear layer]
-            k (int, optional): [The value of k in k-winners strategy]. Defaults to 5.
-            alpha (float, optional): [Contribution factor of top indices to the duty cycle]. Defaults to 0.1.
-            beta (float, optional): [Boost coefficient for units in a layer]. Defaults to 0 i.e. No boosting. 
-        """
-        duty_cycle = (1 - self.alpha) * self.prev_duty_cycle + self.alpha * inputs
+    def updateDC(self, inputs, duty_cycle):
+        duty_cycle = (1 - self.alpha) * duty_cycle + self.alpha * (inputs.gt(0).sum(dim=0,dtype=torch.float))
         return duty_cycle
 
     def forward(self, inputs):
-        out_shape = list(inputs.shape)
-        inputs = inputs.reshape(inputs.shape[0], -1)
+        in_features = inputs.shape[-1]
+        out_shape=list(inputs.shape)
+        inputs = inputs.reshape(inputs.shape[0],-1)
 
-        if self.prev_duty_cycle is None:
-            self.prev_duty_cycle = torch.zeros(inputs.shape[-1])
+        device = inputs.device
+       
+        if self.duty_cycle is None:
+            self.duty_cycle = torch.zeros(in_features, requires_grad=True).to(device)
         
-        if self.k is None:
-            self.k = math.floor(self.act_sparsity * inputs.shape[-1])
-        
-        target = self.k / torch.norm(inputs, dim=-1, keepdim=True)
-        boost_coefficient = torch.exp(self.beta * (target - self.prev_duty_cycle))
-        
-        values, indices = torch.topk(boost_coefficient * inputs, self.k, dim=-1, sorted=False)
-        outputs = torch.zeros_like(inputs).t().scatter_(0, indices.t(), values.t()).t()
+        k = math.floor((1-self.act_sparsity) * in_features)
+        with torch.no_grad():
+            
+            target = k / inputs.shape[-1]
+            boost_coefficient = torch.exp(self.beta * (target - self.duty_cycle))
+            boosted_input = inputs * boost_coefficient 
+            
+            # Get top k values 
+            values, indices = boosted_input.topk( k, dim=-1, sorted=False)
+            row_indices = torch.arange(inputs.shape[0]).repeat_interleave(k).view(-1,k)
+            
+        outputs = torch.zeros_like(inputs).to(device)
+        outputs = outputs.index_put((row_indices, indices), inputs[row_indices, indices], accumulate=False) 
         
         if self.training:
-            self.prev_duty_cycle = self.updateDC(outputs, self.prev_duty_cycle)
+            with torch.no_grad():
+                self.duty_cycle = self.updateDC(outputs, self.duty_cycle)
         
         return outputs.view(out_shape)
     
     def extra_repr(self):
-        return 'k={}, alpha={}, beta={}, prev_duty_cycle={}'.format(
-            self.k, self.alpha, self.beta, self.prev_duty_cycle
+        return 'act_sparsity={}, alpha={}, beta={}, duty_cycle={}'.format(
+            self.act_sparsity, self.alpha, self.beta, self.duty_cycle
         )
