@@ -10,7 +10,6 @@ The provided layer along with the dynamic activation sparsity module is compatib
 - [More about Dynamic Activation](#kwin)
 - [Installation](#install)
 - [Getting Started](#usage)
-- [Benchmark Results](#results)
 
 ### More about SparseLinear <a name="intro"></a>
 The default arguments initialize a sparse linear layer with random connections that applies a linear transformation to the incoming data <img src="https://render.githubusercontent.com/render/math?math=y = xA^T %2B b">  
@@ -87,7 +86,12 @@ In addition, we provide a Dynamic Activation Sparsity module to utilize principl
 ```
 
 ### Installation <a name="install"></a>
+ 
+- Follow the installation instructions and Install Pytorch Sparse package from [here](https://github.com/rusty1s/pytorch_sparse)
+- Then run 
+
+```pip install sparselinear```
 
 ### Getting Started <a name="usage"></a>
 
-### Benchmark Results <a name="results"></a>
+We provide a Jupyter notebook in [this]() repository that demonstrates the basic functionalities of the sparse linear layer. We also show steps to train various models using the additional features of this package.
