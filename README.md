@@ -13,7 +13,7 @@ The provided layer along with the dynamic activation sparsity module is compatib
 - [Benchmark Results](#results)
 
 ### More about SparseLinear <a name="intro"></a>
-The default arguments initialize a sparse linear layer with random connections that applies a linear transformation to the incoming data y = xA<sup>T</sup> + b 
+The default arguments initialize a sparse linear layer with random connections that applies a linear transformation to the incoming data <img src="https://render.githubusercontent.com/render/math?math=y = xA^T + b">  
 
 ##### Parameters
 
@@ -36,7 +36,7 @@ The default arguments initialize a sparse linear layer with random connections t
 
 ##### Variables 
 
-- **~SparseLinear.weight** - the learnable weights of the module of shape `(out_features, in_features)`. The values are initialized from $\mathcal{U}(-\sqrt{k}, \sqrt{k})$, where k = \frac{1}{\text{in\_features}} <img src="https://render.githubusercontent.com/render/math?math=\mathcal{U}(-\sqrt{k}, \sqrt{k})">
+- **~SparseLinear.weight** - the learnable weights of the module of shape `(out_features, in_features)`. The values are initialized from <img src="https://render.githubusercontent.com/render/math?math=\mathcal{U}(-\sqrt{k}, \sqrt{k})">, where <img src="https://render.githubusercontent.com/render/math?math=k = \frac{1}{\text{in\_features}}">  
 - **~SparseLinear.bias** - the learnable bias of the module of shape `(out_features)`. If `bias` is ``True``, the values are initialized from \mathcal{U}(-\sqrt{k}, \sqrt{k}) where k = \frac{1}{\text{in\_features}}
 
 ##### Examples:
