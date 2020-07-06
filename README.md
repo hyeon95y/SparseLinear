@@ -88,9 +88,7 @@ In addition, we provide a Dynamic Activation Sparsity module to utilize principl
 ### Installation <a name="install"></a>
  
 - Follow the installation instructions and Install Pytorch Sparse package from [here](https://github.com/rusty1s/pytorch_sparse)
-- Then run 
-
-```pip install sparselinear```
+- Then run ```pip install sparselinear```
 
 ### Getting Started <a name="usage"></a>
 
