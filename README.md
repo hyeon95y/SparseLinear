@@ -36,7 +36,7 @@ The default arguments initialize a sparse linear layer with random connections t
 
 ##### Variables 
 
-- **~SparseLinear.weight** - the learnable weights of the module of shape `(out_features, in_features)`. The values are initialized from $\mathcal{U}(-\sqrt{k}, \sqrt{k})$, where k = \frac{1}{\text{in\_features}} <img src="https://render.githubusercontent.com/render/math?math=e^{i \pi} = -1">
+- **~SparseLinear.weight** - the learnable weights of the module of shape `(out_features, in_features)`. The values are initialized from $\mathcal{U}(-\sqrt{k}, \sqrt{k})$, where k = \frac{1}{\text{in\_features}} <img src="https://render.githubusercontent.com/render/math?math=\mathcal{U}(-\sqrt{k}, \sqrt{k})">
 - **~SparseLinear.bias** - the learnable bias of the module of shape `(out_features)`. If `bias` is ``True``, the values are initialized from \mathcal{U}(-\sqrt{k}, \sqrt{k}) where k = \frac{1}{\text{in\_features}}
 
 ##### Examples:
