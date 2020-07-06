@@ -13,7 +13,7 @@ The provided layer along with the dynamic activation sparsity module is compatib
 - [Benchmark Results](#results)
 
 ### More about SparseLinear <a name="intro"></a>
-The default arguments initialize a sparse linear layer with random connections that applies a linear transformation to the incoming data `y = xA<sup>T</sup> + b` 
+The default arguments initialize a sparse linear layer with random connections that applies a linear transformation to the incoming data y = xA<sup>T</sup> + b 
 
 ##### Parameters
 
