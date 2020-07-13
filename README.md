@@ -20,8 +20,8 @@ The default arguments initialize a sparse linear layer with random connections t
 - **out_features** - size of each output sample
 - **bias** - If set to ``False``, the layer will not learn an additive bias. Default: ``True``
 - **sparsity** - sparsity of weight matrix. Default: `0.9`
-- **connectivity** - user defined sparsity matrix. Default: `None`
-- **small_world** - boolean flag to generate small world sparsity. Default: ``False``
+- **connectivity** - user-defined sparsity matrix. Default: `None`
+- **small_world** - boolean flag to generate small-world sparsity. Default: ``False``
 - **dynamic** - boolean flag to dynamically change the network structure. Default: ``False``
 - **deltaT** - frequency for growing and pruning update step. Default: `6000`
 - **Tend** - stopping time for growing and pruning algorithm update step. Default: `150000`
