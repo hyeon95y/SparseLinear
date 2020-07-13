@@ -155,7 +155,7 @@ class SparseLinear(nn.Module):
         torch.Size([128, 30])
     """
 
-    def __init__(self, in_features, out_features, bias=True, sparsity=0.9, connectivity=None, small_world=False, dynamic=False, deltaT=6000, Tend = 150000, alpha = 0.1, max_size=1e8):
+    def __init__(self, in_features, out_features, bias=True, sparsity=0.9, connectivity=None, small_world=False, dynamic=False, deltaT=6000, Tend=150000, alpha=0.1, max_size=1e8):
         assert in_features < 2**31 and out_features < 2**31 and sparsity < 1.0
         assert connectivity is None or not small_world, "Cannot specify connectivity along with small world sparsity"
         if connectivity is not None:
@@ -168,6 +168,7 @@ class SparseLinear(nn.Module):
         self.connectivity = connectivity
         self.small_world = small_world
         self.dynamic = dynamic
+        self.max_size = max_size
         
         # Generate and coalesce indices
         coalesce_device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu') # Faster to coalesce on GPU
@@ -203,9 +204,8 @@ class SparseLinear(nn.Module):
             inputs = torch.arange(1 + offset * (out_features > in_features), in_features + 1 + offset * (out_features > in_features), device=coalesce_device)
             outputs = torch.arange(1 + offset * (out_features < in_features), out_features + 1 + offset * (out_features < in_features), device=coalesce_device)
 
-            max_data = 1e8                                          # Max params per alg. iteration
             total_data = in_features * out_features                 # Total params
-            chunks = math.ceil(total_data / max_data)
+            chunks = math.ceil(total_data / self.max_size)
             split_div = max(in_features, out_features) // chunks    # Full chunks
             split_mod = max(in_features, out_features) % chunks     # Remaining chunk
             idx = torch.repeat_interleave(torch.Tensor([split_div]), chunks).int().to(device=coalesce_device)
@@ -284,7 +284,6 @@ class SparseLinear(nn.Module):
             self.Tend = Tend
             self.alpha = alpha
             self.itr_count = 0
-            self.max_size = max_size
 
         self.reset_parameters()
 
