@@ -56,7 +56,7 @@ One can choose to add self-defined static sparsity. The `connectivity` flag acce
 
 #### Small-world Sparsity
 
-The default static sparsity is random. With this flag, one can instead use small-world sparsity. See [here](https://en.wikipedia.org/wiki/Small-world_network). To specify, set `small_world` to `True`. Specifically, we make connections distant dependent to ensure small-world behavior.
+The default static sparsity is random. With this flag, one can instead use small-world sparsity. See [here](https://en.wikipedia.org/wiki/Small-world_network). To specify, set `small_world` to `True`. Specifically, we make connections distance-dependent to ensure small-world behavior.
 
 #### Dynamic Growing and Pruning Algorithm
 
