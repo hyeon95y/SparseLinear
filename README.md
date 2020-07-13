@@ -26,7 +26,7 @@ The default arguments initialize a sparse linear layer with random connections t
 - **deltaT** - frequency for growing and pruning update step. Default: `6000`
 - **Tend** - stopping time for growing and pruning algorithm update step. Default: `150000`
 - **alpha** - f-decay parameter for cosine updates. Default: `0.1`
-- **max_size** - maximum number of entries allowed before chunking occurrs. Default: `1e8`
+- **max_size** - maximum number of entries allowed before chunking occurrs for small-world network generation and dynamic connections. Default: `1e8`
 
 #### Shape
 
