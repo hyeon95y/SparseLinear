@@ -7,7 +7,7 @@ with open("README.md", "r") as fh:
 
 install_requires = ['numpy', 'torch']
 setup(name='sparselinear',
-        version='0.0.1',
+        version='0.0.5',
         description='Pytorch extension library for creating sparse linear layers',
         long_description=long_description,
         long_description_content_type="text/markdown",
