@@ -248,7 +248,7 @@ class SparseLinear(nn.Module):
                 return P
 
             for i in range(chunks):
-                inputs_ = inputs[idx[i]:idx[i+1]] if out_features < in_features else inputs
+                inputs_ = inputs[idx[i]:idx[i+1]] if out_features <= in_features else inputs
                 outputs_ = outputs[idx[i]:idx[i+1]] if out_features > in_features else outputs
 
                 y = small_world_chunker(inputs_, outputs_, round(nnz / chunks))
