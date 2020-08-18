@@ -41,7 +41,7 @@ The default arguments initialize a sparse linear layer with random connections t
 #### Examples:
 
 ```python
- >>> m = nn.SparseLinear(20, 30)
+ >>> m = sl.SparseLinear(20, 30)
  >>> input = torch.randn(128, 20)
  >>> output = m(input)
  >>> print(output.size())
