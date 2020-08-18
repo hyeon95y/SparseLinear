@@ -7,6 +7,35 @@ import torch.nn as nn
 
 import torch_sparse
 
+# Utility function for small world initiialization
+def small_world_chunker(inputs, outputs, nnz):
+        pair_distance = inputs.view(-1, 1) - outputs
+        arg = torch.abs(pair_distance) + 1.
+        # lambda search
+        L, U = 1e-5, 5.  
+        lamb = 1.                   # initial guess
+        itr = 1
+        error_threshold = 10.
+        max_itr = 1000
+        P = arg**(-lamb)
+        P_sum = P.sum()
+        error = abs(P_sum - nnz)
+
+        while error > error_threshold:
+            assert itr <= max_itr, 'No solution found; please try different network sizes and sparsity levels'
+            if P_sum < nnz:
+                U = lamb
+                lamb = (lamb + L) / 2.
+            elif P_sum > nnz:
+                L = lamb
+                lamb = (lamb + U) / 2.
+                       
+                P = arg**(-lamb)
+                P_sum = P.sum()
+                error = abs(P_sum - nnz)
+                itr += 1
+        return P
+
 # Custom pytorch function to handle growing connections
 class GrowConnections(torch.autograd.Function):
     @staticmethod
@@ -189,7 +218,7 @@ class SparseLinear(nn.Module):
             else:
                 # User defined sparsity
                 nnz = connectivity.shape[1]
-                self.sparsity = nnz/(out_features*in_features)
+                self.sparsity = 1.0 - nnz/(out_features*in_features)
                 connectivity = connectivity.to(device=coalesce_device)
                 indices = connectivity
                 
@@ -217,36 +246,7 @@ class SparseLinear(nn.Module):
 
             rows = torch.empty(0).long().to(device=coalesce_device)
             cols = torch.empty(0).long().to(device=coalesce_device)
-
-            def small_world_chunker(inputs, outputs, nnz):
-                pair_distance = inputs.view(-1, 1) - outputs
-                arg = torch.abs(pair_distance) + 1.
-                # lambda search
-                error = float('inf')
-                L, U = 1e-5, 5.  
-                lamb = 1.                   # initial guess
-                itr = 1
-                error_threshold = 10.
-                max_itr = 1000
-                P = arg**(-lamb)
-                P_sum = P.sum()
-                error = abs(P_sum - nnz)
-
-                while error > error_threshold:
-                    assert itr <= max_itr, 'No solution found; please try different network sizes and sparsity levels'
-                    if P_sum < nnz:
-                        U = lamb
-                        lamb = (lamb + L) / 2.
-                    elif P_sum > nnz:
-                        L = lamb
-                        lamb = (lamb + U) / 2.
-                        
-                    P = arg**(-lamb)
-                    P_sum = P.sum()
-                    error = abs(P_sum - nnz)
-                    itr += 1
-                return P
-
+            
             for i in range(chunks):
                 inputs_ = inputs[idx[i]:idx[i+1]] if out_features <= in_features else inputs
                 outputs_ = outputs[idx[i]:idx[i+1]] if out_features > in_features else outputs
@@ -293,6 +293,7 @@ class SparseLinear(nn.Module):
         if self.bias is not None:
             nn.init.uniform_(self.bias, -bound, bound)
 
+
     @property
     def weight(self):
         """ returns a torch.sparse.FloatTensor view of the underlying weight matrix 
@@ -302,7 +303,7 @@ class SparseLinear(nn.Module):
         return weight.coalesce().detach()
 
     def forward(self, inputs):
-        if self.dynamic:
+        if self.training and self.dynamic:
             self.itr_count+= 1
         output_shape = list(inputs.shape)
         output_shape[-1] = self.out_features
