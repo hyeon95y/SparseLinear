@@ -431,7 +431,7 @@ class SparseLinear(nn.Module):
 
             # output = torch_sparse.spmm(self.indices, self.weights, self.out_features, self.in_features, inputs.t()).t()
             target = torch.sparse.FloatTensor(
-                self.indices,
+                self.indices.long(),
                 self.weights,
                 torch.Size([self.out_features, self.in_features]),
             ).to_dense()
